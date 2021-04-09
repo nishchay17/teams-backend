@@ -118,7 +118,7 @@ exports.login = async (req, res) => {
     if (!isMatch)
       return res.status(400).json({
         status: false,
-        message: "Incorrect Password !",
+        message: "Incorrect Password!",
       });
 
     const payload = {
@@ -236,6 +236,55 @@ exports.createUser = async (req, res) => {
     res.send({
       status: false,
       message: "Error in Fetching user",
+    });
+  }
+};
+
+/**
+ * @name  updatePassword
+ * @route  api/user/update-password
+ * @description  updates user password
+ * @body  oldPassword, password
+ */
+exports.updatePassword = async (req, res) => {
+  const errors = validationResult(req);
+
+  if (!errors.isEmpty()) {
+    return res.status(400).json({
+      status: false,
+      errors: errors.array(),
+    });
+  }
+
+  const { oldPassword, password } = req.body;
+  const id = req.user.id;
+  console.log({ oldPassword, password, id });
+  try {
+    const user = await User.findById(id);
+
+    const isMatch = await bcrypt.compare(oldPassword, user.password);
+    if (!isMatch)
+      return res.status(400).json({
+        status: false,
+        message: "Incorrect Password!",
+      });
+    const salt = await bcrypt.genSalt(10);
+    const encPassword = await bcrypt.hash(password, salt);
+    const updatedUser = await User.findByIdAndUpdate(
+      id,
+      { password: encPassword },
+      { new: true }
+    );
+
+    res.json({
+      status: true,
+      message: "Password updated successful",
+    });
+  } catch (e) {
+    console.error(e);
+    res.status(500).json({
+      status: false,
+      message: "Server Error",
     });
   }
 };

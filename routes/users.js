@@ -7,6 +7,7 @@ const {
   login,
   me,
   createUser,
+  updatePassword,
 } = require("../controllers/userController");
 const { withAuth, withAdmin } = require("../middleware/auth");
 
@@ -55,7 +56,7 @@ router.get("/me", withAuth, me);
 /**
  * @method  POST
  * @description  creates user and give joiningId back
- * @route  api/user/me
+ * @route  api/user/create-user
  * @protected
  * @admin
  */
@@ -65,6 +66,24 @@ router.post(
   withAuth,
   withAdmin,
   createUser
+);
+
+/**
+ * @method  PUT
+ * @description  update password
+ * @route  api/user/update-password
+ * @protected
+ */
+router.put(
+  "/update-password",
+  [
+    check("oldPassword", "Please enter old password"),
+    check("password", "Please enter password").isLength({
+      min: 6,
+    }),
+  ],
+  withAuth,
+  updatePassword
 );
 
 module.exports = router;
