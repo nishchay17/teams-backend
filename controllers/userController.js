@@ -3,15 +3,15 @@ const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 
 const User = require("../models/User");
-const { getRandomNumber } = require("../util/random");
+const { getRandomNumber, getJoiningID } = require("../util/random");
 
 /**
- * @name  createUser
+ * @name  signup
  * @route  api/user/signup
- * @description  create user
- * @body  name, email, password, phoneNumber
+ * @description  populates remaining fields of user
+ * @body  name, password, phoneNumber, joiningId
  */
-exports.createUser = async (req, res) => {
+exports.signup = async (req, res) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     return res.status(400).json({
@@ -20,16 +20,22 @@ exports.createUser = async (req, res) => {
     });
   }
 
-  const { name, email, password, phoneNumber } = req.body;
+  const { name, password, phoneNumber, joiningId } = req.body;
 
   try {
-    let user = await User.findOne({
-      email,
-    });
-    if (user) {
+    const user = await User.findOne({ joiningId });
+
+    if (!user) {
       return res.status(400).json({
         status: false,
-        message: "User Already Exists!",
+        message: "Joining Id is wrong",
+      });
+    }
+    if (user.name) {
+      // if name is already there that means that the user is already registered
+      return res.status(400).json({
+        status: false,
+        message: "User already resister",
       });
     }
 
@@ -38,24 +44,23 @@ exports.createUser = async (req, res) => {
     const random = getRandomNumber(100, 200);
 
     const employeeId = firstname + "-" + organizationName + "-" + random;
-
-    user = new User({
-      name,
-      email,
-      password,
-      phoneNumber,
-      organization: organizationName,
-      employeeId,
-    });
-
     const salt = await bcrypt.genSalt(10);
-    user.password = await bcrypt.hash(password, salt);
+    const encPassword = await bcrypt.hash(password, salt);
 
-    await user.save();
+    const updatedUser = await User.findByIdAndUpdate(
+      user._id,
+      {
+        name,
+        password: encPassword,
+        phoneNumber,
+        employeeId,
+      },
+      { new: true }
+    );
 
     const payload = {
       user: {
-        id: user.id,
+        id: updatedUser.id,
       },
     };
 
@@ -149,16 +154,21 @@ exports.login = async (req, res) => {
  * @name  me
  * @route  api/user/me
  * @description  gets logged in user's information
- * @body  userId, where is populated by withAuth middleware
+ * @body  userId, which is populated by withAuth middleware
  */
 exports.me = async (req, res) => {
   try {
-    const user = await User.findById(req.user.id)
-      .populate("taskAssigned")
-      .populate("taskInProgress")
-      .populate("taskCompleted");
+    const user = await User.findById(req.user.id);
+    // .populate("taskAssigned")
+    // .populate("taskInProgress")
+    // .populate("taskCompleted");
+
+    /**
+     * @todo populate other fields
+     */
 
     user.password = undefined;
+    user.joiningId = undefined;
     user._id = undefined;
     user.organization = undefined;
     user.createdAt = undefined;
@@ -167,6 +177,60 @@ exports.me = async (req, res) => {
     res.json({
       status: true,
       user,
+    });
+  } catch (e) {
+    res.send({
+      status: false,
+      message: "Error in Fetching user",
+    });
+  }
+};
+
+/**
+ * @name  createUser
+ * @route  api/user/create-user
+ * @description  create a new user and generates the joining ID
+ * @body  email
+ */
+exports.createUser = async (req, res) => {
+  const errors = validationResult(req);
+
+  if (!errors.isEmpty()) {
+    return res.status(400).json({
+      status: false,
+      errors: errors.array(),
+    });
+  }
+
+  const { email } = req.body;
+
+  try {
+    let user = await User.findOne({ email });
+    if (user) {
+      return res.status(400).json({
+        status: false,
+        message: "User Already Exists!",
+        joiningId: user.joiningId,
+      });
+    }
+
+    const joiningId = getJoiningID();
+
+    /**
+     * @todo email this joining id to the new user
+     */
+
+    user = new User({
+      joiningId,
+      email,
+      organization: "teams",
+    });
+
+    await user.save();
+
+    res.json({
+      status: true,
+      joiningId,
     });
   } catch (e) {
     res.send({

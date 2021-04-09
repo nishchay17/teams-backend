@@ -2,8 +2,13 @@ const express = require("express");
 const router = express.Router();
 const { check } = require("express-validator");
 
-const { createUser, login, me } = require("../controllers/userController");
-const { withAuth } = require("../middleware/withAuth");
+const {
+  signup,
+  login,
+  me,
+  createUser,
+} = require("../controllers/userController");
+const { withAuth, withAdmin } = require("../middleware/auth");
 
 /**
  * @method  POST
@@ -14,13 +19,13 @@ router.post(
   "/signup",
   [
     check("name", "Please Enter a Valid name"),
-    check("email", "Please enter a valid email").isEmail(),
     check("phoneNumber", "Please enter a valid phone number"),
-    check("Password", "Please enter a valid password").isLength({
+    check("joiningId", "Please enter joining Id"),
+    check("password", "Please enter a valid password").isLength({
       min: 6,
     }),
   ],
-  createUser
+  signup
 );
 
 /**
@@ -42,9 +47,24 @@ router.post(
 /**
  * @method  GET
  * @description  Get LoggedIn User
- * @param  /user/me
+ * @route  api/user/me
  * @protected
  */
 router.get("/me", withAuth, me);
+
+/**
+ * @method  POST
+ * @description  creates user and give joiningId back
+ * @route  api/user/me
+ * @protected
+ * @admin
+ */
+router.post(
+  "/create-user",
+  [check("email", "Please enter a valid email").isEmail()],
+  withAuth,
+  // withAdmin,
+  createUser
+);
 
 module.exports = router;

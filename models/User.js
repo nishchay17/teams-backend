@@ -5,27 +5,36 @@ const UserSchema = mongoose.Schema(
   {
     name: {
       type: String,
-      required: true,
+    },
+    joiningId: {
+      type: String,
+      require: true,
     },
     employeeId: {
       type: String,
-      required: true,
     },
     email: {
       type: String,
-      required: true,
     },
     password: {
       type: String,
-      required: true,
     },
     phoneNumber: {
       type: Number,
-      required: true,
     },
     organization: {
       type: String,
       required: true,
+    },
+    isAdmin: {
+      type: Boolean,
+      required: false,
+      default: false,
+    },
+    isDeleted: {
+      type: Boolean,
+      required: false,
+      default: false,
     },
     taskAssigned: [
       {
@@ -51,4 +60,4 @@ const UserSchema = mongoose.Schema(
   }
 );
 
-module.exports = mongoose.model("user", UserSchema);
+module.exports = mongoose.model("User", UserSchema);
