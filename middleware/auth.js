@@ -35,13 +35,14 @@ exports.withAuth = async (req, res, next) => {
  */
 exports.withAdmin = async (req, res, next) => {
   try {
-    const user = User.findById(req.user.id);
+    const user = await User.findById(req.user.id);
     if (user.isAdmin === true) {
       next();
+    } else {
+      res
+        .status(403)
+        .json({ status: false, message: "Current user in not a admin" });
     }
-    return res
-      .status(403)
-      .json({ status: false, message: "Current user in not a admin" });
   } catch (e) {
     console.error(e);
     res.status(500).send({ status: true, message: "Invalid Token" });

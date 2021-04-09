@@ -63,7 +63,7 @@ router.post(
   "/create-user",
   [check("email", "Please enter a valid email").isEmail()],
   withAuth,
-  // withAdmin,
+  withAdmin,
   createUser
 );
 
