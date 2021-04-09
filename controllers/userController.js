@@ -1,8 +1,8 @@
-const { validationResult } = require("express-validator/check");
+const { validationResult } = require("express-validator");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 
-const User = require("../model/User");
+const User = require("../models/User");
 const { getRandomNumber } = require("../util/random");
 
 /**
