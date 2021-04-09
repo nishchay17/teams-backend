@@ -12,6 +12,14 @@ const {
 const { withAuth, withAdmin } = require("../middleware/auth");
 
 /**
+ * @todo getAllUsers
+ * @todo update other fields of user
+ * @todo make admin
+ * @todo delete users
+ * @todo get user by empId
+ */
+
+/**
  * @method  POST
  * @route  api/user/signup
  * @description  user sign-up
