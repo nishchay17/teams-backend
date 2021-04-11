@@ -26,14 +26,14 @@ exports.signup = async (req, res) => {
     const user = await User.findOne({ joiningId });
 
     if (!user) {
-      return res.status(400).json({
+      return res.status(200).json({
         status: false,
         message: "Joining Id is wrong",
       });
     }
     if (user.name) {
       // if name is already there that means that the user is already registered
-      return res.status(400).json({
+      return res.status(200).json({
         status: false,
         message: "User already resister",
       });
@@ -108,17 +108,18 @@ exports.login = async (req, res) => {
     let user = await User.findOne({
       email,
     });
+
     if (!user)
-      return res.status(400).json({
+      return res.status(200).json({
         status: false,
         message: "User Not Exist",
       });
 
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch)
-      return res.status(400).json({
+      return res.status(200).json({
         status: false,
-        message: "Incorrect Password!",
+        message: "Invalid credentials",
       });
 
     const payload = {
@@ -158,14 +159,10 @@ exports.login = async (req, res) => {
  */
 exports.me = async (req, res) => {
   try {
-    const user = await User.findById(req.user.id);
-    // .populate("taskAssigned")
-    // .populate("taskInProgress")
-    // .populate("taskCompleted");
-
-    /**
-     * @todo populate other fields
-     */
+    const user = await User.findById(req.user.id)
+      .populate("taskAssigned")
+      .populate("taskInProgress")
+      .populate("taskCompleted");
 
     user.password = undefined;
     user.joiningId = undefined;
@@ -207,7 +204,7 @@ exports.createUser = async (req, res) => {
   try {
     let user = await User.findOne({ email });
     if (user) {
-      return res.status(400).json({
+      return res.status(200).json({
         status: false,
         message: "User Already Exists!",
         joiningId: user.joiningId,
@@ -228,7 +225,7 @@ exports.createUser = async (req, res) => {
 
     await user.save();
 
-    res.json({
+    res.status(200).json({
       status: true,
       joiningId,
     });
@@ -264,19 +261,15 @@ exports.updatePassword = async (req, res) => {
 
     const isMatch = await bcrypt.compare(oldPassword, user.password);
     if (!isMatch)
-      return res.status(400).json({
+      return res.status(200).json({
         status: false,
         message: "Incorrect Password!",
       });
     const salt = await bcrypt.genSalt(10);
     const encPassword = await bcrypt.hash(password, salt);
-    const updatedUser = await User.findByIdAndUpdate(
-      id,
-      { password: encPassword },
-      { new: true }
-    );
+    await User.findByIdAndUpdate(id, { password: encPassword });
 
-    res.json({
+    res.status(200).json({
       status: true,
       message: "Password updated successful",
     });

@@ -22,11 +22,11 @@ const taskSchema = new mongoose.Schema(
     },
     image: {
       type: String,
-      required: true,
     },
     status: {
       type: Number,
       default: 0,
+      required: true,
     },
     assignedDate: {
       type: Date,
@@ -34,11 +34,9 @@ const taskSchema = new mongoose.Schema(
     },
     inProgressDate: {
       type: Date,
-      required: true,
     },
     completionDate: {
       type: Date,
-      required: true,
     },
     assignedBy: {
       type: ObjectId,
