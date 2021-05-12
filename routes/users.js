@@ -8,15 +8,15 @@ const {
   me,
   createUser,
   updatePassword,
+  getUserByEmployeeId,
+  makeAdmin,
 } = require("../controllers/userController");
 const { withAuth, withAdmin } = require("../middleware/auth");
 
 /**
  * @todo getAllUsers
  * @todo update other fields of user
- * @todo make admin
  * @todo delete users
- * @todo get user by empId
  */
 
 /**
@@ -92,6 +92,36 @@ router.put(
   ],
   withAuth,
   updatePassword
+);
+
+/**
+ * @method  GET
+ * @description  get user by employeeId
+ * @route  api/user/employeeId
+ * @protected
+ * @admin
+ */
+router.get(
+  "/employeeId",
+  [check("employeeId", "Please enter employee Id")],
+  withAuth,
+  withAdmin,
+  getUserByEmployeeId
+);
+
+/**
+ * @method  PUT
+ * @description  make admin to given employeeId user
+ * @route  api/user//make-admin
+ * @protected
+ * @admin
+ */
+router.put(
+  "/make-admin",
+  [check("employeeId", "Please enter employee Id")],
+  withAuth,
+  withAdmin,
+  makeAdmin
 );
 
 module.exports = router;

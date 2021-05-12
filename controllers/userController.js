@@ -184,6 +184,39 @@ exports.me = async (req, res) => {
 };
 
 /**
+ * @name  getUserByEmployeeId
+ * @route  api/user/employeeId
+ * @description  gets user's information by employeeId
+ * @body  employeeId
+ */
+exports.getUserByEmployeeId = async (req, res) => {
+  const { employeeId } = req.body;
+  try {
+    const user = await User.find({ employeeId })
+      .populate("taskAssigned")
+      .populate("taskInProgress")
+      .populate("taskCompleted");
+
+    user.password = undefined;
+    user.joiningId = undefined;
+    user._id = undefined;
+    user.organization = undefined;
+    user.createdAt = undefined;
+    user.updatedAt = undefined;
+
+    res.json({
+      status: true,
+      user,
+    });
+  } catch (e) {
+    res.send({
+      status: false,
+      message: "Error in Fetching user",
+    });
+  }
+};
+
+/**
  * @name  createUser
  * @route  api/user/create-user
  * @description  create a new user and generates the joining ID
@@ -272,6 +305,44 @@ exports.updatePassword = async (req, res) => {
     res.status(200).json({
       status: true,
       message: "Password updated successful",
+    });
+  } catch (e) {
+    console.error(e);
+    res.status(500).json({
+      status: false,
+      message: "Server Error",
+    });
+  }
+};
+
+/**
+ * @name  makeAdmin
+ * @route  api/user/make-admin
+ * @description  marks user admin
+ * @body  employeeId
+ */
+exports.makeAdmin = async (req, res) => {
+  const errors = validationResult(req);
+
+  if (!errors.isEmpty()) {
+    return res.status(400).json({
+      status: false,
+      errors: errors.array(),
+    });
+  }
+
+  const { employeeId } = req.body;
+
+  try {
+    const user = await User.findOneAndUpdate(
+      { employeeId },
+      { isAdmin: true },
+      { new: true }
+    );
+
+    res.status(200).json({
+      status: true,
+      message: "User in now admin",
     });
   } catch (e) {
     console.error(e);
