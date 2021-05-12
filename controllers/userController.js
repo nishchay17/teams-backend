@@ -355,6 +355,15 @@ exports.makeAdmin = async (req, res) => {
 };
 
 exports.isJoiningIdExists = async (req, res) => {
+  const errors = validationResult(req);
+
+  if (!errors.isEmpty()) {
+    return res.status(200).json({
+      status: false,
+      errors: errors.array(),
+    });
+  }
+
   const { joiningId } = req.body;
 
   try {

@@ -10,6 +10,7 @@ const {
   updatePassword,
   getUserByEmployeeId,
   makeAdmin,
+  isJoiningIdExists,
 } = require("../controllers/userController");
 const { withAuth, withAdmin } = require("../middleware/auth");
 
@@ -113,7 +114,7 @@ router.get(
 /**
  * @method  PUT
  * @description  make admin to given employeeId user
- * @route  api/user//make-admin
+ * @route  api/user/make-admin
  * @protected
  * @admin
  */
@@ -123,6 +124,19 @@ router.put(
   withAuth,
   withAdmin,
   makeAdmin
+);
+
+/**
+ * @method  GET
+ * @description  check Joining Id
+ * @route  api/user/check-id
+ * @protected
+ * @admin
+ */
+router.put(
+  "/check-id",
+  [check("employeeId", "Please enter employee Id")],
+  isJoiningIdExists
 );
 
 module.exports = router;
