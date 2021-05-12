@@ -14,13 +14,13 @@ const { getRandomNumber, getJoiningID } = require("../util/random");
 exports.signup = async (req, res) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
-    return res.status(400).json({
+    return res.status(200).json({
       status: false,
       errors: errors.array(),
     });
   }
 
-  const { name, password, phoneNumber, joiningId } = req.body;
+  const { name, password, phoneNumber, joiningId, email } = req.body;
 
   try {
     const user = await User.findOne({ joiningId });
@@ -54,6 +54,7 @@ exports.signup = async (req, res) => {
         password: encPassword,
         phoneNumber,
         employeeId,
+        email,
       },
       { new: true }
     );
@@ -346,6 +347,38 @@ exports.makeAdmin = async (req, res) => {
     });
   } catch (e) {
     console.error(e);
+    res.status(500).json({
+      status: false,
+      message: "Server Error",
+    });
+  }
+};
+
+exports.isJoiningIdExists = async (req, res) => {
+  const { joiningId } = req.body;
+
+  try {
+    const user = await User.findOne({ joiningId });
+
+    if (!user) {
+      return res.status(200).json({
+        status: false,
+        message: "Joining Id is wrong",
+      });
+    }
+    if (user.name) {
+      return res.status(200).json({
+        status: false,
+        message: "User already resister",
+      });
+    } else {
+      return res.status(200).json({
+        status: true,
+        message: "Joining Id is correct",
+      });
+    }
+  } catch (err) {
+    console.log(err);
     res.status(500).json({
       status: false,
       message: "Server Error",
