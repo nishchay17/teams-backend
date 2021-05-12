@@ -133,7 +133,7 @@ router.put(
  * @protected
  * @admin
  */
-router.put(
+router.get(
   "/check-id",
   [check("employeeId", "Please enter employee Id")],
   isJoiningIdExists
