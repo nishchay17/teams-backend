@@ -127,13 +127,11 @@ router.put(
 );
 
 /**
- * @method  GET
+ * @method  POST
  * @description  check Joining Id
  * @route  api/user/check-id
- * @protected
- * @admin
  */
-router.get(
+router.post(
   "/check-id",
   [check("employeeId", "Please enter employee Id")],
   isJoiningIdExists

@@ -365,7 +365,7 @@ exports.isJoiningIdExists = async (req, res) => {
   }
 
   const { joiningId } = req.body;
-
+  console.log(req.body);
   try {
     const user = await User.findOne({ joiningId });
 
