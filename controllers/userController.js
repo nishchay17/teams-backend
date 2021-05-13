@@ -394,3 +394,41 @@ exports.isJoiningIdExists = async (req, res) => {
     });
   }
 };
+
+exports.getAllUsers = async (req, res) => {
+  try {
+    const users = await User.find({}, { isDeleted: 0, password: 0 })
+      .populate("taskAssigned")
+      .populate("taskInProgress")
+      .populate("taskCompleted");
+
+    res.status(200).json({
+      status: true,
+      users,
+    });
+  } catch (err) {
+    console.log(err);
+    res.status(500).json({
+      status: false,
+      message: "Server Error",
+    });
+  }
+};
+
+exports.deleteUser = async (req, res) => {
+  const { id } = req.params;
+  try {
+    await User.findByIdAndDelete(id);
+
+    res.status(200).json({
+      status: true,
+      message: "user deleted",
+    });
+  } catch (err) {
+    console.log(err);
+    res.status(500).json({
+      status: false,
+      message: "Server Error",
+    });
+  }
+};

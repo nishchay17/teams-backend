@@ -3,22 +3,18 @@ const router = express.Router();
 const { check } = require("express-validator");
 
 const {
-  signup,
-  login,
   me,
-  createUser,
-  updatePassword,
-  getUserByEmployeeId,
+  login,
+  signup,
   makeAdmin,
+  deleteUser,
+  createUser,
+  getAllUsers,
+  updatePassword,
   isJoiningIdExists,
+  getUserByEmployeeId,
 } = require("../controllers/userController");
 const { withAuth, withAdmin } = require("../middleware/auth");
-
-/**
- * @todo getAllUsers
- * @todo update other fields of user
- * @todo delete users
- */
 
 /**
  * @method  POST
@@ -127,6 +123,15 @@ router.put(
 );
 
 /**
+ * @method  GET
+ * @description  make admin to given employeeId user
+ * @route  api/user/make-admin
+ * @protected
+ * @admin
+ */
+router.get("/all", withAuth, withAdmin, getAllUsers);
+
+/**
  * @method  POST
  * @description  check Joining Id
  * @route  api/user/check-id
@@ -136,5 +141,14 @@ router.post(
   [check("employeeId", "Please enter employee Id")],
   isJoiningIdExists
 );
+
+/**
+ * @method  DELETE
+ * @description  delete user
+ * @route  api/user/delete/:id
+ * @protected
+ * @admin
+ */
+router.delete("/delete/:id", withAuth, withAdmin, deleteUser);
 
 module.exports = router;

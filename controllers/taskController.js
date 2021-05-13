@@ -154,3 +154,83 @@ exports.taskIsAssigned = async (req, res) => {
     });
   }
 };
+
+/**
+ * @name  editTask
+ * @route  api/task/edit/:id
+ * @description  creates task
+ */
+exports.editTask = async (req, res) => {
+  const { name, description } = req.body;
+  const updateData = {};
+  if (name) updateData.name = name;
+  if (description) updateData.description = description;
+  const { id } = req.params;
+
+  try {
+    const task = await Task.findByIdAndUpdate(id, updateData, { new: true });
+
+    res.status(200).json({
+      status: true,
+      task,
+    });
+  } catch (err) {
+    console.log(err);
+    res.status(500).json({
+      status: false,
+      message: "Server Error",
+    });
+  }
+};
+
+/**
+ * @name  deleteTask
+ * @route  api/task/delete/:id
+ * @description  delete task
+ */
+exports.deleteTask = async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    await Task.findByIdAndDelete(id);
+    res.status(200).json({
+      status: true,
+      message: "deleted",
+    });
+  } catch (err) {
+    console.log(err);
+    res.status(500).json({
+      status: false,
+      message: "Server Error",
+    });
+  }
+};
+
+/**
+ * @name  getTaskById
+ * @route  api/task/get/:id
+ * @description  get task by ID
+ */
+exports.getTaskById = async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    const task = await Task.findById(id);
+    if (task === null) {
+      return res.status(200).json({
+        status: false,
+        message: "Not found",
+      });
+    }
+    res.status(200).json({
+      status: true,
+      task,
+    });
+  } catch (err) {
+    console.log(err);
+    res.status(500).json({
+      status: false,
+      message: "Server Error",
+    });
+  }
+};

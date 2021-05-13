@@ -4,7 +4,10 @@ const { check } = require("express-validator");
 
 const { withAuth, withAdmin } = require("../middleware/auth");
 const {
+  editTask,
+  deleteTask,
   createTask,
+  getTaskById,
   taskInProcess,
   taskIsCompleted,
   taskIsAssigned,
@@ -28,6 +31,32 @@ router.post(
   withAdmin,
   createTask
 );
+
+/**
+ * @method  GET
+ * @route  api/task/get/:id
+ * @description  get task by ID
+ * @protected
+ */
+router.get("/get/:id", withAuth, getTaskById);
+
+/**
+ * @method  PUT
+ * @route  api/task/edit/:id
+ * @description  edits task
+ * @protected
+ * @admin
+ */
+router.put("/edit/:id", withAuth, withAdmin, editTask);
+
+/**
+ * @method  DELETE
+ * @route  api/task/delete/:id
+ * @description  delete task
+ * @protected
+ * @admin
+ */
+router.delete("/delete/:id", withAuth, withAdmin, deleteTask);
 
 /**
  * @method  GET
