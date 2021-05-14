@@ -9,6 +9,7 @@ const cors = require("cors");
 const indexRouter = require("./routes/index");
 const usersRouter = require("./routes/users");
 const taskRouter = require("./routes/tasks");
+const bucketRouter = require("./routes/bucket");
 const { connectToDatabase } = require("./util/connectDatabase");
 
 dotenv.config();
@@ -28,6 +29,7 @@ app.use(cors());
 app.use("/", indexRouter);
 app.use("/api/user", usersRouter);
 app.use("/api/task", taskRouter);
+app.use("/api/bucket", bucketRouter);
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {

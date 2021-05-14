@@ -20,7 +20,7 @@ exports.signup = async (req, res) => {
     });
   }
 
-  const { name, password, phoneNumber, joiningId, email } = req.body;
+  const { name, password, phoneNumber, joiningId } = req.body;
 
   try {
     const user = await User.findOne({ joiningId });
@@ -54,7 +54,6 @@ exports.signup = async (req, res) => {
         password: encPassword,
         phoneNumber,
         employeeId,
-        email,
       },
       { new: true }
     );
@@ -306,7 +305,7 @@ exports.updatePassword = async (req, res) => {
   const errors = validationResult(req);
 
   if (!errors.isEmpty()) {
-    return res.status(400).json({
+    return res.status(200).json({
       status: false,
       errors: errors.array(),
     });
