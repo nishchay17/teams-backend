@@ -160,10 +160,35 @@ exports.login = async (req, res) => {
  */
 exports.me = async (req, res) => {
   try {
-    const user = await User.findById(req.user.id)
-      .populate("taskAssigned")
-      .populate("taskInProgress")
-      .populate("taskCompleted");
+    const user = await User.findById(req.user.id).populate([
+      {
+        path: "taskAssigned",
+        model: "Task",
+        populate: {
+          path: "assignedBy",
+          model: "User",
+          select: "email name",
+        },
+      },
+      {
+        path: "taskInProgress",
+        model: "Task",
+        populate: {
+          path: "assignedBy",
+          model: "User",
+          select: "email name",
+        },
+      },
+      {
+        path: "taskCompleted",
+        model: "Task",
+        populate: {
+          path: "assignedBy",
+          model: "User",
+          select: "email name",
+        },
+      },
+    ]);
 
     user.password = undefined;
     user.joiningId = undefined;
