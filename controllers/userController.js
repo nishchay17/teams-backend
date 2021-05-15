@@ -75,6 +75,7 @@ exports.signup = async (req, res) => {
         res.status(200).json({
           status: true,
           token,
+          isAdmin: user.isAdmin,
         });
       }
     );
