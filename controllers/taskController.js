@@ -215,7 +215,9 @@ exports.getTaskById = async (req, res) => {
   const { id } = req.params;
 
   try {
-    const task = await Task.findById(id);
+    const task = await Task.findById(id)
+      .populate("assignedBy", { name: true })
+      .populate("assignedTo", { name: true });
     if (task === null) {
       return res.status(200).json({
         status: false,
