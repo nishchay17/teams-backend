@@ -21,7 +21,7 @@ exports.createTask = async (req, res) => {
   const { name, description, assignedTo } = req.body;
 
   try {
-    const user = await User.findOne({ _id: assignedTo });
+    const user = await User.findById(assignedTo);
 
     if (!user) {
       return res.status(400).json({
