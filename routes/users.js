@@ -124,7 +124,7 @@ router.put(
 /**
  * @method  GET
  * @description  make admin to given employeeId user
- * @route  api/user/make-admin
+ * @route  api/user/all
  * @protected
  * @admin
  */
