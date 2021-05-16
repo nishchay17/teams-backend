@@ -22,6 +22,7 @@ exports.upload = async (req, res) => {
     console.log(upload);
     uploadFile(upload, (err, file) => {
       if (err) {
+        console.log(err);
         return res.json({ status: false, message: "Failed to upload" });
       }
       try {
