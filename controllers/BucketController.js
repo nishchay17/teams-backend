@@ -14,11 +14,12 @@ exports.upload = async (req, res) => {
         error: "something went wrong",
       });
     }
-    const { name, description, tags } = fields;
+    const { name, description } = fields;
     const upload = {
       data: fs.readFileSync(file.file.path),
       name: file.file.name,
     };
+    console.log(upload);
     uploadFile(upload, (err, file) => {
       if (err) {
         return res.json({ status: false, message: "Failed to upload" });
@@ -27,7 +28,7 @@ exports.upload = async (req, res) => {
         const item = new BucketItem({
           name,
           description,
-          tags,
+          tags: "",
           uploadedBy: req.user.id,
           file: file.Location,
         });
