@@ -1,7 +1,10 @@
 const { validationResult } = require("express-validator");
+const formidable = require("formidable");
+const fs = require("fs");
 
 const Task = require("../models/Task");
 const User = require("../models/User");
+const { uploadFile } = require("../util/files");
 
 /**
  * @name  create
@@ -58,6 +61,81 @@ exports.createTask = async (req, res) => {
       message: "Server Error",
     });
   }
+};
+
+/**
+ * @name  createV2
+ * @route  api/task/create/v2
+ * @description  create new task with file (version 2)
+ * @body   name, description, assignedTo, file
+ */
+exports.createTaskV2 = async (req, res) => {
+  const form = formidable.IncomingForm();
+  form.keepExtensions = true;
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.status(400).json({
+      status: false,
+      errors: errors.array(),
+    });
+  }
+  form.parse(req, async (err, fields, file) => {
+    if (err) {
+      return res.status(200).json({
+        status: false,
+        error: "something went wrong",
+      });
+    }
+    const { name, description, assignedTo } = fields;
+    const upload = {
+      data: fs.readFileSync(file.file.path),
+      name: file.file.name,
+    };
+    console.log(upload);
+    uploadFile(upload, async (err, file) => {
+      if (err) {
+        console.log(err);
+        return res.json({ status: false, message: "Failed to upload" });
+      }
+      try {
+        const user = await User.findById(assignedTo);
+
+        if (!user) {
+          return res.status(200).json({
+            status: false,
+            message: "Can not find the user",
+          });
+        }
+        console.log(user);
+
+        const task = new Task({
+          name,
+          description,
+          assignedTo: user._id,
+          assignedDate: new Date(),
+          status: 0,
+          assignedBy: req.user.id,
+          image: file.Location,
+        });
+
+        await task.save();
+
+        await User.findByIdAndUpdate(user._id, {
+          $push: { taskAssigned: task._id },
+        });
+
+        res.status(200).json({
+          status: true,
+          task,
+        });
+      } catch (err) {
+        res.status(500).json({
+          status: false,
+          message: "Server Error",
+        });
+      }
+    });
+  });
 };
 
 /**

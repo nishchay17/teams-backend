@@ -11,6 +11,7 @@ const {
   taskInProcess,
   taskIsCompleted,
   taskIsAssigned,
+  createTaskV2,
 } = require("../controllers/taskController");
 
 /**
@@ -30,6 +31,24 @@ router.post(
   withAuth,
   withAdmin,
   createTask
+);
+/**
+ * @method  POST
+ * @route  api/task/create/vs
+ * @description  creates task with file
+ * @protected
+ * @admin
+ */
+router.post(
+  "/create/v2",
+  [
+    check("name", "Please Enter a Valid name"),
+    check("description", "Please enter a valid description"),
+    check("assignedTo", "Please enter joining Id"),
+  ],
+  withAuth,
+  withAdmin,
+  createTaskV2
 );
 
 /**
