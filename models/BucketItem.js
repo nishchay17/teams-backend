@@ -9,7 +9,7 @@ const bucketItemSchema = new mongoose.Schema(
     },
     description: {
       type: String,
-      required: true,
+      required: false,
     },
     file: {
       type: String,

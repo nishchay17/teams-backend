@@ -35,22 +35,12 @@ router.post(
 );
 /**
  * @method  POST
- * @route  api/task/create/vs
+ * @route  api/task/create/v2
  * @description  creates task with file
  * @protected
  * @admin
  */
-router.post(
-  "/create/v2",
-  [
-    check("name", "Please Enter a Valid name"),
-    check("description", "Please enter a valid description"),
-    check("assignedTo", "Please enter joining Id"),
-  ],
-  withAuth,
-  withAdmin,
-  createTaskV2
-);
+router.post("/create/v2", withAuth, withAdmin, createTaskV2);
 
 /**
  * @method  GET
