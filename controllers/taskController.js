@@ -296,3 +296,23 @@ exports.getTaskById = async (req, res) => {
     });
   }
 };
+
+exports.photo = async (req, res, next) => {
+  try {
+    const item = await Task.findById(req.params.id);
+    if (item.fileData) {
+      res.set("Content-type", item.fileData.contentType);
+      return res.send(item.fileData.data);
+    } else {
+      return res.status(200).json({
+        status: false,
+        message: "not found",
+      });
+    }
+  } catch (e) {
+    console.log(e);
+    return res.status(500).json({
+      status: false,
+    });
+  }
+};

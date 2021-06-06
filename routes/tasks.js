@@ -12,6 +12,7 @@ const {
   taskIsCompleted,
   taskIsAssigned,
   createTaskV2,
+  photo,
 } = require("../controllers/taskController");
 
 /**
@@ -103,5 +104,14 @@ router.get("/isAssigned/:id", withAuth, taskIsAssigned);
  * @protected
  */
 router.get("/isCompleted/:id", withAuth, taskIsCompleted);
+
+/**
+ * @method  GET
+ * @route  api/task/file/:id
+ * @description  get task's file
+ * @params  id - task id
+ * @protected
+ */
+router.get("/file/:id", withAuth, photo);
 
 module.exports = router;

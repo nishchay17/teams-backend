@@ -101,3 +101,17 @@ exports.deleteById = async (req, res) => {
     });
   }
 };
+
+exports.photo = async (req, res, next) => {
+  console.log(req.params.id);
+  try {
+    const item = await BucketItem.findById(req.params.id);
+    res.set("Content-type", item.fileData.contentType);
+    return res.send(item.fileData.data);
+  } catch (e) {
+    console.log(e);
+    return res.status(500).json({
+      status: false,
+    });
+  }
+};
