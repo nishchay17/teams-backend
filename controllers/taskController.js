@@ -87,53 +87,35 @@ exports.createTaskV2 = async (req, res) => {
       });
     }
     const { name, description, assignedTo } = fields;
-    const upload = {
-      data: fs.readFileSync(file.file.path),
-      name: file.file.name,
-    };
-    console.log(upload);
-    uploadFile(upload, async (err, file) => {
-      if (err) {
-        console.log(err);
-        return res.json({ status: false, message: "Failed to upload" });
-      }
-      try {
-        const user = await User.findById(assignedTo);
 
-        if (!user) {
-          return res.status(200).json({
-            status: false,
-            message: "Can not find the user",
-          });
-        }
-        console.log(user);
+    const user = await User.findById(assignedTo);
 
-        const task = new Task({
-          name,
-          description,
-          assignedTo: user._id,
-          assignedDate: new Date(),
-          status: 0,
-          assignedBy: req.user.id,
-          image: file.Location,
-        });
+    if (!user) {
+      return res.status(200).json({
+        status: false,
+        message: "Can not find the user",
+      });
+    }
 
-        await task.save();
+    const task = new Task({
+      name,
+      description,
+      assignedTo: user._id,
+      assignedDate: new Date(),
+      status: 0,
+      assignedBy: req.user.id,
+    });
+    task.fileData.data = fs.readFileSync(file.file.path);
+    task.fileData.contentType = file.file.type;
+    await task.save();
 
-        await User.findByIdAndUpdate(user._id, {
-          $push: { taskAssigned: task._id },
-        });
+    await User.findByIdAndUpdate(user._id, {
+      $push: { taskAssigned: task._id },
+    });
 
-        res.status(200).json({
-          status: true,
-          task,
-        });
-      } catch (err) {
-        res.status(500).json({
-          status: false,
-          message: "Server Error",
-        });
-      }
+    res.status(200).json({
+      status: true,
+      message: "task created",
     });
   });
 };

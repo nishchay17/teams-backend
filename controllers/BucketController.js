@@ -7,7 +7,7 @@ const { uploadFile, deleteFile } = require("../util/files");
 exports.upload = async (req, res) => {
   const form = formidable.IncomingForm();
   form.keepExtensions = true;
-  form.parse(req, (err, fields, file) => {
+  form.parse(req, async (err, fields, file) => {
     if (err) {
       return res.status(200).json({
         status: false,
@@ -15,33 +15,33 @@ exports.upload = async (req, res) => {
       });
     }
     const { name, description } = fields;
-    const upload = {
-      data: fs.readFileSync(file.file.path),
-      name: file.file.name,
-    };
-    console.log(upload);
-    uploadFile(upload, (err, file) => {
-      if (err) {
-        console.log(err);
-        return res.json({ status: false, message: "Failed to upload" });
-      }
-      try {
-        const item = new BucketItem({
-          name,
-          description,
-          tags: "",
-          uploadedBy: req.user.id,
-          file: file.Location,
-        });
-        item.save();
-        res.json({ status: true, item });
-      } catch (err) {
-        res.status(500).json({
-          status: false,
-          message: "Server Error",
-        });
-      }
+
+    if (file.file === undefined) {
+      return res.status(200).json({
+        status: false,
+        message: "file not found",
+      });
+    }
+
+    if (file?.file.size > 10485760) {
+      //10mb in bytes
+      return res.status(200).json({
+        status: false,
+        message: "file is too big",
+      });
+    }
+
+    let item = new BucketItem({
+      name,
+      description,
+      tags: "",
+      uploadedBy: req.user.id,
     });
+    item.fileData.data = fs.readFileSync(file.file.path);
+    item.fileData.contentType = file.file.type;
+    await item.save();
+
+    res.json({ status: true, message: "item created" });
   });
 };
 
