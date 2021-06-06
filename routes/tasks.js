@@ -102,6 +102,6 @@ router.get("/isCompleted/:id", withAuth, taskIsCompleted);
  * @params  id - task id
  * @protected
  */
-router.get("/file/:id", withAuth, photo);
+router.get("/file/:id", photo);
 
 module.exports = router;
