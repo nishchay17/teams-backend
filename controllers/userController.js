@@ -141,6 +141,7 @@ exports.login = async (req, res) => {
           status: true,
           token,
           isAdmin: user.isAdmin,
+          name: user.name,
         });
       }
     );
@@ -251,16 +252,13 @@ exports.getUserByEmployeeId = async (req, res) => {
  */
 exports.createUser = async (req, res) => {
   const errors = validationResult(req);
-
   if (!errors.isEmpty()) {
     return res.status(400).json({
       status: false,
       errors: errors.array(),
     });
   }
-
   const { email } = req.body;
-
   try {
     let user = await User.findOne({ email });
     if (user) {
@@ -270,21 +268,13 @@ exports.createUser = async (req, res) => {
         joiningId: user.joiningId,
       });
     }
-
     const joiningId = getJoiningID();
-
-    /**
-     * @todo email this joining id to the new user
-     */
-
     user = new User({
       joiningId,
       email,
       organization: "teams",
     });
-
     await user.save();
-
     res.status(200).json({
       status: true,
       joiningId,
@@ -447,8 +437,7 @@ exports.getAllUsers = async (req, res) => {
 exports.deleteUser = async (req, res) => {
   const { id } = req.params;
   try {
-    await User.findByIdAndDelete(id);
-
+    await User.findByIdAndUpdate(id, { isDeleted: true });
     res.status(200).json({
       status: true,
       message: "user deleted",
