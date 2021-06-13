@@ -414,7 +414,7 @@ exports.isJoiningIdExists = async (req, res) => {
 exports.getAllUsers = async (req, res) => {
   try {
     const users = await User.find(
-      { name: { $exists: true } },
+      { name: { $exists: true }, isDeleted: false },
       { isDeleted: 0, password: 0 }
     )
       .populate("taskAssigned")
