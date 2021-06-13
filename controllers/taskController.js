@@ -105,8 +105,10 @@ exports.createTaskV2 = async (req, res) => {
       status: 0,
       assignedBy: req.user.id,
     });
-    task.fileData.data = fs.readFileSync(file.file.path);
-    task.fileData.contentType = file.file.type;
+    if (file.file) {
+      task.fileData.data = fs.readFileSync(file.file.path);
+      task.fileData.contentType = file.file.type;
+    }
     await task.save();
 
     await User.findByIdAndUpdate(user._id, {
