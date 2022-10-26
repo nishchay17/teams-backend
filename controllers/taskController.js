@@ -1,10 +1,8 @@
 const { validationResult } = require("express-validator");
-const formidable = require("formidable");
-const fs = require("fs");
 
 const Task = require("../models/Task");
 const User = require("../models/User");
-const { uploadFile } = require("../util/files");
+const cloudinary = require("../util/cloudinary");
 
 /**
  * @name  create
@@ -70,8 +68,6 @@ exports.createTask = async (req, res) => {
  * @body   name, description, assignedTo, file
  */
 exports.createTaskV2 = async (req, res) => {
-  const form = formidable.IncomingForm();
-  form.keepExtensions = true;
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     return res.status(400).json({
@@ -79,24 +75,19 @@ exports.createTaskV2 = async (req, res) => {
       errors: errors.array(),
     });
   }
-  form.parse(req, async (err, fields, file) => {
-    if (err) {
-      return res.status(200).json({
-        status: false,
-        error: "something went wrong",
-      });
-    }
-    const { name, description, assignedTo } = fields;
 
-    const user = await User.findById(assignedTo);
+  const { name, description, assignedTo } = req.body;
+  const user = await User.findById(assignedTo);
 
-    if (!user) {
-      return res.status(200).json({
-        status: false,
-        message: "Can not find the user",
-      });
-    }
+  if (!user) {
+    return res.status(200).json({
+      status: false,
+      message: "Can not find the user",
+    });
+  }
 
+  try {
+    const result = await cloudinary().uploader.upload(req.file.path);
     const task = new Task({
       name,
       description,
@@ -104,22 +95,19 @@ exports.createTaskV2 = async (req, res) => {
       assignedDate: new Date(),
       status: 0,
       assignedBy: req.user.id,
+      file: result.url
     });
-    if (file.file) {
-      task.fileData.data = fs.readFileSync(file.file.path);
-      task.fileData.contentType = file.file.type;
-    }
     await task.save();
-
     await User.findByIdAndUpdate(user._id, {
       $push: { taskAssigned: task._id },
     });
-
     res.status(200).json({
       status: true,
       message: "task created",
     });
-  });
+  } catch (e) {
+    console.log(e);
+  }
 };
 
 /**

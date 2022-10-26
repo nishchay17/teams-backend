@@ -2,6 +2,7 @@ const express = require("express");
 const router = express.Router();
 const { check } = require("express-validator");
 
+const upload = require("../util/multer");
 const { withAuth, withAdmin } = require("../middleware/auth");
 const {
   editTask,
@@ -40,7 +41,7 @@ router.post(
  * @protected
  * @admin
  */
-router.post("/create/v2", withAuth, withAdmin, createTaskV2);
+router.post("/create/v2", withAuth, withAdmin, upload.single("file"), createTaskV2);
 
 /**
  * @method  GET

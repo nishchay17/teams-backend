@@ -23,9 +23,8 @@ const taskSchema = new mongoose.Schema(
     image: {
       type: String,
     },
-    fileData: {
-      data: Buffer,
-      contentType: String,
+    file: {
+      type: String,
     },
     status: {
       type: Number,
