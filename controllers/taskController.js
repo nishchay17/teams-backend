@@ -87,7 +87,7 @@ exports.createTaskV2 = async (req, res) => {
   }
 
   try {
-    const result = await cloudinary().uploader.upload(req.file.path);
+    const result = await cloudinary().uploader.upload(req.file.path, { folder: "teams" });
     const task = new Task({
       name,
       description,
