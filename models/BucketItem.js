@@ -15,10 +15,6 @@ const bucketItemSchema = new mongoose.Schema(
       type: String,
       require: true,
     },
-    fileData: {
-      data: Buffer,
-      contentType: String,
-    },
     tags: {
       type: String,
       require: true,

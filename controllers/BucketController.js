@@ -3,46 +3,40 @@ const fs = require("fs");
 
 const BucketItem = require("../models/BucketItem");
 const { uploadFile, deleteFile } = require("../util/files");
+const cloudinary = require("../util/cloudinary");
 
 exports.upload = async (req, res) => {
-  const form = formidable.IncomingForm();
-  form.keepExtensions = true;
-  form.parse(req, async (err, fields, file) => {
-    if (err) {
-      return res.status(200).json({
-        status: false,
-        error: "something went wrong",
-      });
-    }
-    const { name, description } = fields;
+  const { name, description } = req.body;
 
-    if (file.file === undefined) {
-      return res.status(200).json({
-        status: false,
-        message: "file not found",
-      });
-    }
+  if (req.file === undefined) {
+    return res.status(200).json({
+      status: false,
+      message: "file not found",
+    });
+  }
 
-    if (file?.file.size > 10485760) {
-      //10mb in bytes
-      return res.status(200).json({
-        status: false,
-        message: "file is too big",
-      });
-    }
+  if (req?.file.size > 10485760) {
+    //10mb in bytes
+    return res.status(200).json({
+      status: false,
+      message: "file is too big",
+    });
+  }
 
+  try {
+    const result = await cloudinary().uploader.upload(req.file.path, { folder: "teams/bucket" });
     let item = new BucketItem({
       name,
       description,
       tags: "",
       uploadedBy: req.user.id,
+      file: result.url
     });
-    item.fileData.data = fs.readFileSync(file.file.path);
-    item.fileData.contentType = file.file.type;
     await item.save();
-
     res.json({ status: true, message: "item created" });
-  });
+  } catch (e) {
+    console.log(e);
+  }
 };
 
 exports.getAll = async (req, res) => {

@@ -8,9 +8,11 @@ const {
   photo,
 } = require("../controllers/BucketController");
 const { withAuth } = require("../middleware/auth");
+const multer = require("../util/multer");
+
 const router = express.Router();
 
-router.post("/upload", withAuth, upload);
+router.post("/upload", withAuth, multer.single("file"), upload);
 
 router.get("/file/:id", photo);
 
