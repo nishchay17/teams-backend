@@ -24,7 +24,15 @@ exports.upload = async (req, res) => {
   }
 
   try {
-    const result = await cloudinary().uploader.upload(req.file.path, { folder: "teams/bucket" });
+    let result;
+    try {
+      result = await cloudinary().uploader.upload(req.file.path, { folder: "teams/bucket" });
+    } catch (e) {
+      return res.status(400).json({
+        status: false,
+        message: e.message
+      })
+    }
     let item = new BucketItem({
       name,
       description,
@@ -36,6 +44,10 @@ exports.upload = async (req, res) => {
     res.json({ status: true, message: "item created" });
   } catch (e) {
     console.log(e);
+    res.status(500).json({
+      status: false,
+      message: "Server Error",
+    });
   }
 };
 

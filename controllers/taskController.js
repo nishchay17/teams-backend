@@ -82,12 +82,15 @@ exports.createTaskV2 = async (req, res) => {
   if (!user) {
     return res.status(200).json({
       status: false,
-      message: "Can not find the user",
+      message: "Can't find the user",
     });
   }
 
   try {
-    const result = await cloudinary().uploader.upload(req.file.path, { folder: "teams" });
+    let result;
+    if (req.file?.path) {
+      result = await cloudinary().uploader.upload(req.file.path, { folder: "teams" });
+    }
     const task = new Task({
       name,
       description,
@@ -95,7 +98,7 @@ exports.createTaskV2 = async (req, res) => {
       assignedDate: new Date(),
       status: 0,
       assignedBy: req.user.id,
-      file: result.url
+      file: result?.url
     });
     await task.save();
     await User.findByIdAndUpdate(user._id, {
@@ -103,10 +106,11 @@ exports.createTaskV2 = async (req, res) => {
     });
     res.status(200).json({
       status: true,
-      message: "task created",
+      message: "Task created successfully",
     });
   } catch (e) {
     console.log(e);
+    return res.status(500).json({ status: false, message: "Internal server error" });
   }
 };
 

@@ -12,9 +12,9 @@ exports.withAuth = async (req, res, next) => {
     token = req.headers.authorization.split(" ")[1];
   }
   if (!token)
-    return res.status(200).json({
+    return res.status(401).json({
       status: false,
-      message: "No Token",
+      message: "No token, please login again",
     });
 
   try {
@@ -24,7 +24,7 @@ exports.withAuth = async (req, res, next) => {
     next();
   } catch (e) {
     console.error(e);
-    res.status(500).send({ status: true, message: "Invalid Token" });
+    res.status(500).send({ status: false, message: "Invalid Token" });
   }
 };
 
@@ -44,6 +44,6 @@ exports.withAdmin = async (req, res, next) => {
     }
   } catch (e) {
     console.error(e);
-    res.status(500).send({ status: true, message: "Invalid Token" });
+    res.status(500).send({ status: false, message: "Invalid Token" });
   }
 };
