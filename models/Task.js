@@ -49,6 +49,10 @@ const taskSchema = new mongoose.Schema(
       type: ObjectId,
       ref: "User",
     },
+    isArchived: {
+      type: Boolean,
+      default: false,
+    }
   },
   {
     timestamps: true,

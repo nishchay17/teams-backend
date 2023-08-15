@@ -215,12 +215,26 @@ exports.taskIsAssigned = async (req, res) => {
  * @description  creates task
  */
 exports.editTask = async (req, res) => {
-  const { name, description } = req.body;
+  const { name, description, assignedTo } = req.body;
   const updateData = {};
   if (name) updateData.name = name;
   if (description) updateData.description = description;
   const { id } = req.params;
-
+  if (!!assignedTo) {
+    const user = await User.findById(assignedTo);
+    if (!user) {
+      return res.status(200).json({
+        status: false,
+        message: "Can't find the user",
+      });
+    }
+    updateData.assignedTo = user._id
+  }
+  let result;
+  if (req.file?.path) {
+    result = await cloudinary().uploader.upload(req.file.path, { folder: "teams" });
+  }
+  updateData.file = result?.url
   try {
     const task = await Task.findByIdAndUpdate(id, updateData, { new: true });
 
@@ -310,3 +324,21 @@ exports.photo = async (req, res, next) => {
     });
   }
 };
+
+exports.archiveTask = async (req, res) => {
+  const { id } = req.params;
+  try {
+    const updateData = { isArchived: true }
+    await Task.findByIdAndUpdate(id, updateData);
+    res.status(200).json({
+      status: true,
+      message: "task archived",
+    });
+  } catch (err) {
+    console.log(err);
+    res.status(500).json({
+      status: false,
+      message: "Server Error",
+    });
+  }
+}

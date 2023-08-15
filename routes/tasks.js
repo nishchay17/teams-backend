@@ -13,6 +13,7 @@ const {
   taskIsCompleted,
   taskIsAssigned,
   createTaskV2,
+  archiveTask,
   photo,
 } = require("../controllers/taskController");
 
@@ -49,6 +50,7 @@ router.post("/create/v2", withAuth, withAdmin, upload.single("file"), createTask
  * @description  get task by ID
  * @protected
  */
+router.get("/:id", withAuth, getTaskById);
 router.get("/get/:id", withAuth, getTaskById);
 
 /**
@@ -59,6 +61,7 @@ router.get("/get/:id", withAuth, getTaskById);
  * @admin
  */
 router.put("/edit/:id", withAuth, withAdmin, editTask);
+router.put("/:id", withAuth, withAdmin, upload.single("file"), editTask);
 
 /**
  * @method  DELETE
@@ -95,6 +98,15 @@ router.get("/isAssigned/:id", withAuth, taskIsAssigned);
  * @protected
  */
 router.get("/isCompleted/:id", withAuth, taskIsCompleted);
+
+/**
+ * @method  PUT
+ * @route  api/task/archive/:id
+ * @description  archive task
+ * @params  id - task id that has to be updated
+ * @protected
+ */
+router.put("/archive/:id", withAuth, archiveTask);
 
 /**
  * @method  GET

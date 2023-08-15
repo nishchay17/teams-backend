@@ -167,15 +167,21 @@ exports.me = async (req, res) => {
       {
         path: "taskAssigned",
         model: "Task",
+        match: {
+          isArchived: false
+        },
         populate: {
           path: "assignedBy",
           model: "User",
-          select: "email name",
+          select: "email name"
         },
       },
       {
         path: "taskInProgress",
         model: "Task",
+        match: {
+          isArchived: false
+        },
         populate: {
           path: "assignedBy",
           model: "User",
@@ -185,6 +191,9 @@ exports.me = async (req, res) => {
       {
         path: "taskCompleted",
         model: "Task",
+        match: {
+          isArchived: false
+        },
         populate: {
           path: "assignedBy",
           model: "User",
@@ -253,12 +262,12 @@ exports.getUserByEmployeeId = async (req, res) => {
  */
 exports.createUser = async (req, res) => {
   const errors = validationResult(req);
-  if (!errors.isEmpty()) {
-    return res.status(400).json({
-      status: false,
-      errors: errors.array(),
-    });
-  }
+  // if (!errors.isEmpty()) {
+  //   return res.status(400).json({
+  //     status: false,
+  //     errors: errors.array(),
+  //   });
+  // }
   const { email } = req.body;
   try {
     let user = await User.findOne({ email });
