@@ -76,7 +76,7 @@ exports.createTaskV2 = async (req, res) => {
     });
   }
 
-  const { name, description, assignedTo } = req.body;
+  const { name, description, assignedTo, priority } = req.body;
   const user = await User.findById(assignedTo);
 
   if (!user) {
@@ -98,7 +98,8 @@ exports.createTaskV2 = async (req, res) => {
       assignedDate: new Date(),
       status: 0,
       assignedBy: req.user.id,
-      file: result?.url
+      file: result?.url,
+      priority
     });
     await task.save();
     await User.findByIdAndUpdate(user._id, {
@@ -215,10 +216,11 @@ exports.taskIsAssigned = async (req, res) => {
  * @description  creates task
  */
 exports.editTask = async (req, res) => {
-  const { name, description, assignedTo } = req.body;
+  const { name, description, assignedTo, priority } = req.body;
   const updateData = {};
   if (name) updateData.name = name;
   if (description) updateData.description = description;
+  if (priority) updateData.priority = priority;
   const { id } = req.params;
   if (!!assignedTo) {
     const user = await User.findById(assignedTo);

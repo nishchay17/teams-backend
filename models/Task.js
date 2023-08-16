@@ -52,6 +52,11 @@ const taskSchema = new mongoose.Schema(
     isArchived: {
       type: Boolean,
       default: false,
+    },
+    priority: {
+      type: String,
+      enum: ['high', 'medium', 'low'],
+      default: 'medium'
     }
   },
   {
