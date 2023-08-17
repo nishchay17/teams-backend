@@ -19,6 +19,7 @@ router.get("/file/:id", photo);
 router.get("/get-all", withAuth, getAll);
 
 router.get("/get/:id", withAuth, getById);
+router.get("/:id", withAuth, getById);
 
 router.delete("/delete/:id", withAuth, deleteById);
 
