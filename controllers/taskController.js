@@ -265,7 +265,7 @@ exports.deleteTask = async (req, res) => {
     await Task.findByIdAndDelete(id);
     res.status(200).json({
       status: true,
-      message: "deleted",
+      message: "task deleted successfully",
     });
   } catch (err) {
     console.log(err);
@@ -307,6 +307,34 @@ exports.getTaskById = async (req, res) => {
   }
 };
 
+/**
+ * @name  getArchivedTask
+ * @route  api/task/archive
+ * @description  get archived task
+ */
+exports.getArchivedTask = async (req, res) => {
+  try {
+    const tasks = await Task.find({ isArchived: true })
+      .populate("assignedBy", { name: true })
+      .populate("assignedTo", { name: true });
+    if (!tasks || tasks.length === 0) {
+      return res.status(200).json({
+        status: false,
+        message: "No tasks found",
+      });
+    }
+    return res.status(200).json({
+      status: true,
+      tasks,
+    });
+  } catch (err) {
+    res.status(500).json({
+      status: false,
+      message: "Server error",
+    });
+  }
+};
+
 exports.photo = async (req, res, next) => {
   try {
     const item = await Task.findById(req.params.id);
@@ -337,10 +365,9 @@ exports.archiveTask = async (req, res) => {
       message: "task archived",
     });
   } catch (err) {
-    console.log(err);
     res.status(500).json({
       status: false,
-      message: "Server Error",
+      message: "Server Error in here bro",
     });
   }
 }

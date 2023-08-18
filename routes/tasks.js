@@ -15,6 +15,7 @@ const {
   createTaskV2,
   archiveTask,
   photo,
+  getArchivedTask,
 } = require("../controllers/taskController");
 
 /**
@@ -43,15 +44,6 @@ router.post(
  * @admin
  */
 router.post("/create/v2", withAuth, withAdmin, upload.single("file"), createTaskV2);
-
-/**
- * @method  GET
- * @route  api/task/get/:id
- * @description  get task by ID
- * @protected
- */
-router.get("/:id", withAuth, getTaskById);
-router.get("/get/:id", withAuth, getTaskById);
 
 /**
  * @method  PUT
@@ -100,6 +92,14 @@ router.get("/isAssigned/:id", withAuth, taskIsAssigned);
 router.get("/isCompleted/:id", withAuth, taskIsCompleted);
 
 /**
+ * @method  GET
+ * @route  api/task/archived
+ * @description  get archived task
+ * @protected
+ */
+router.get("/archived", withAuth, getArchivedTask);
+
+/**
  * @method  PUT
  * @route  api/task/archive/:id
  * @description  archive task
@@ -116,5 +116,14 @@ router.put("/archive/:id", withAuth, archiveTask);
  * @protected
  */
 router.get("/file/:id", photo);
+
+/**
+ * @method  GET
+ * @route  api/task/get/:id
+ * @description  get task by ID
+ * @protected
+ */
+router.get("/:id", withAuth, getTaskById);
+router.get("/get/:id", withAuth, getTaskById);
 
 module.exports = router;
