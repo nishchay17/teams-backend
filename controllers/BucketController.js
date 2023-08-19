@@ -52,13 +52,25 @@ exports.upload = async (req, res) => {
 };
 
 exports.getAll = async (req, res) => {
+  const { pageNo = 0, perPage = 16 } = req.query;
   try {
-    const bucketItems = await BucketItem.find({}).populate("uploadedBy", {
-      name: 1,
-    });
+    const bucketItems = await BucketItem
+      .find({})
+      .limit(+perPage)
+      .skip(perPage * pageNo)
+      .sort({ createdAt: 'desc' })
+      .populate("uploadedBy", {
+        name: 1,
+      });
+    const count = await BucketItem.countDocuments({})
     res.json({
       status: true,
       bucketItems,
+      pagination: {
+        size: perPage,
+        pageNo,
+        count
+      },
     });
   } catch (err) {
     console.log(err);

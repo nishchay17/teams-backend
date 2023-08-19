@@ -422,17 +422,25 @@ exports.isJoiningIdExists = async (req, res) => {
 };
 
 exports.getAllUsers = async (req, res) => {
+  const { pageNo = 0, perPage = 16 } = req.query;
   try {
     const users = await User.find(
       { name: { $exists: true }, isDeleted: false },
       { isDeleted: 0, password: 0 }
-    )
+    ).limit(+perPage)
+      .skip(perPage * pageNo)
+      .sort({ createdAt: 'desc' })
       .populate("taskAssigned")
       .populate("taskInProgress")
       .populate("taskCompleted");
-
+    const count = await User.countDocuments({ name: { $exists: true }, isDeleted: false })
     res.status(200).json({
       status: true,
+      pagination: {
+        size: perPage,
+        pageNo,
+        count
+      },
       users,
     });
   } catch (err) {

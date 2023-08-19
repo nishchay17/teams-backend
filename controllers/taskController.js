@@ -313,8 +313,12 @@ exports.getTaskById = async (req, res) => {
  * @description  get archived task
  */
 exports.getArchivedTask = async (req, res) => {
+  const { pageNo = 0, perPage = 10 } = req.query;
   try {
     const tasks = await Task.find({ isArchived: true })
+      .limit(+perPage)
+      .skip(perPage * pageNo)
+      .sort({ updatedAt: 'desc' })
       .populate("assignedBy", { name: true })
       .populate("assignedTo", { name: true });
     if (!tasks || tasks.length === 0) {
@@ -323,9 +327,15 @@ exports.getArchivedTask = async (req, res) => {
         message: "No tasks found",
       });
     }
+    const count = await Task.countDocuments({ isArchived: true })
     return res.status(200).json({
       status: true,
       tasks,
+      pagination: {
+        size: perPage,
+        pageNo,
+        count
+      },
     });
   } catch (err) {
     res.status(500).json({
