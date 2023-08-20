@@ -103,13 +103,10 @@ exports.getById = async (req, res) => {
 exports.deleteById = async (req, res) => {
   const { id } = req.params;
   try {
-    const bucketItem = await BucketItem.findByIdAndDelete(id);
-
-    deleteFile(bucketItem.file, (err, data) => {
-      res.json({
-        status: true,
-        bucketItem,
-      });
+    await BucketItem.findByIdAndDelete(id);
+    res.json({
+      status: true,
+      message: "bucket item deleted successfully",
     });
   } catch (err) {
     console.log(err);
