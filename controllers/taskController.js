@@ -368,11 +368,12 @@ exports.photo = async (req, res, next) => {
 exports.archiveTask = async (req, res) => {
   const { id } = req.params;
   try {
-    const updateData = { isArchived: true }
+    const task = await Task.findById(id);
+    const updateData = { isArchived: !task.isArchived }
     await Task.findByIdAndUpdate(id, updateData);
     res.status(200).json({
       status: true,
-      message: "task archived",
+      message: `task ${task.isArchived ? "unarchived" : "archived"} successfully`,
     });
   } catch (err) {
     res.status(500).json({
