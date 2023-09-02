@@ -25,7 +25,6 @@ router.post(
   "/signup",
   [
     check("name", "Please Enter a Valid name"),
-    check("phoneNumber", "Please enter a valid phone number"),
     check("joiningId", "Please enter joining Id"),
     check("password", "Please enter a valid password").isLength({
       min: 6,
