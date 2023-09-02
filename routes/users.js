@@ -21,17 +21,7 @@ const { withAuth, withAdmin } = require("../middleware/auth");
  * @route  api/user/signup
  * @description  user sign-up
  */
-router.post(
-  "/signup",
-  [
-    check("name", "Please Enter a Valid name"),
-    check("joiningId", "Please enter joining Id"),
-    check("password", "Please enter a valid password").isLength({
-      min: 6,
-    }),
-  ],
-  signup
-);
+router.post("/signup", signup);
 
 /**
  * @method  POST
@@ -66,7 +56,6 @@ router.get("/me", withAuth, me);
  */
 router.post(
   "/create-user",
-  [check("email", "Please enter a valid email").isEmail()],
   withAuth,
   withAdmin,
   createUser

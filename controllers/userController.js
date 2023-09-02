@@ -12,16 +12,7 @@ const { getRandomNumber, getJoiningID } = require("../util/random");
  * @body  name, password, phoneNumber, joiningId
  */
 exports.signup = async (req, res) => {
-  const errors = validationResult(req);
-  if (!errors.isEmpty()) {
-    return res.status(200).json({
-      status: false,
-      errors: errors.array(),
-    });
-  }
-
   const { name, password, phoneNumber, joiningId } = req.body;
-
   try {
     const user = await User.findOne({ joiningId });
 
@@ -77,6 +68,7 @@ exports.signup = async (req, res) => {
           token,
           isAdmin: user.isAdmin,
           name,
+          message: "user signed in successfully"
         });
       }
     );
@@ -261,16 +253,11 @@ exports.getUserByEmployeeId = async (req, res) => {
  * @body  email
  */
 exports.createUser = async (req, res) => {
-  const errors = validationResult(req);
-  // if (!errors.isEmpty()) {
-  //   return res.status(400).json({
-  //     status: false,
-  //     errors: errors.array(),
-  //   });
-  // }
   const { email } = req.body;
+  console.log(req.body)
   try {
     let user = await User.findOne({ email });
+    console.log({ user, email });
     if (user) {
       return res.status(200).json({
         status: false,
